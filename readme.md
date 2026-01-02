@@ -7,8 +7,6 @@ Dieses Projekt ist eine **2D-Schüttgutsimulation** in Python, die zufällige Pu
 
 ## Installation
 
-1. Repository klonen:
-
 ```bash
 git clone https://github.com/deinusername/schuettgut.git
 cd schuettgut
