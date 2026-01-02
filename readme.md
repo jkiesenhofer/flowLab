@@ -1,4 +1,4 @@
-## OpenBulk exercise
+## openBulk exercise
 
 ---
 
