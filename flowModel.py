@@ -38,7 +38,7 @@ y_vals = [p[1] for p in points]
 
 plt.figure(figsize=(8,6))
 plt.scatter(x_vals, y_vals, c="blue", s=50)
-plt.title("2D-Schüttgutsimulation mit Böschungswinkel")
+plt.title("Dispersed metal particles in air")
 plt.xlim(0, width)
 plt.ylim(0, max(y_vals)+1)
 plt.gca().set_aspect("equal", adjustable="box")
@@ -46,3 +46,4 @@ plt.grid(True, linestyle="--", alpha=0.4)
 
 # Bild speichern
 plt.savefig('point_cloud.png', dpi=300)
+
