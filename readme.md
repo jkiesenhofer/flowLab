@@ -10,5 +10,3 @@ git clone https://github.com/jkiesenhofer/flowMaterial.git
 pip install openpiv
 
 gfortran stokes.f90 -o stokes
-./stokes 
-gnuplot ./plot
