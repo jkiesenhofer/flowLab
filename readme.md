@@ -8,3 +8,6 @@ Dissolved Air Flotation (DAF) is a water treatment process that removes suspende
 git clone https://github.com/jkiesenhofer/flowMaterial.git
 
 pip install openpiv
+gfortran stokes.f90 -o stokes
+./stokes 
+gnuplot ./plot
