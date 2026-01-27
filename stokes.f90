@@ -15,7 +15,7 @@ program stokeszahl
 
   do i = 1, 100
      dp = i * 1.0d-6    ! Partikeldurchmesser [m]
-     db = i * 1.0d-3    ! Blasendurchmesser [m]
+     db = i * 1.0d-4    ! Blasendurchmesser [m]
      K1 = rho_p * dp**2 * Ua / (18.0d0 * mu * L)
      K2 = rho_p * dp**2 * Ub / (18.0d0 * mu * L)
      K3 = rho_p * dp**2 * Uc / (18.0d0 * mu * L)
