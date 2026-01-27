@@ -1,13 +1,13 @@
 program stokeszahl
   implicit none
   integer :: i
-  real(8) :: dp, rho_p, mu, Ua, Ub, L, K1, K2, K3
+  real(8) :: dp, rho_p, mu, Ua, Ub, Uc, L, K1, K2, K3
 
   rho_p = 2500.0d0      ! Partikeldichte [kg/m^3]
   mu    = 1.8d-5        ! dyn. Viskosität Luft [Pa s]
   Ua    = 2.0d0         ! Strömungsgeschwindigkeit [m/s]
   Ub    = 5.0d0         ! Strömungsgeschwindigkeit [m/s]
-  Ub    = 8.0d0         ! Strömungsgeschwindigkeit [m/s]
+  Uc    = 8.0d0         ! Strömungsgeschwindigkeit [m/s]
   L     = 0.1d0         ! charakteristische Länge [m]
 
   open(unit=10, file="stokes.dat", status="replace")
