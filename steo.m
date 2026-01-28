@@ -11,7 +11,7 @@ tau_f = 0.01;      % charakteristische Strömungszeit [s]
 d = linspace(1e-5, 2e-3, 200);  % [m]
 
 % Eötvöszahl
-Eo = (rho_l - rho_g) .* g .* d.^2 ./ sigma; % Gravitationskräfte zu Oberflächenspannungskräften
+Eo = (rho_l - rho_g) .* g .* d.^2 ./ sigma; % Gravitationskräfte zu Oberflächenspannungskräfte
 
 % Stokeszahl
 tau_p = rho_p .* d.^2 ./ (18 * mu);
