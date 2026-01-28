@@ -1,7 +1,7 @@
 [x,y] = meshgrid(linspace(0,2*pi,100));
 rho = 7900;
 mu = 1e-1;
-sigma = 0.072;
+
 L = sqrt(max(x).^2 + max(y).^2);
 
 u =  sin(y) + 0.5*cos(3*x).*sin(2*y);
