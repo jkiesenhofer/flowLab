@@ -1,6 +1,6 @@
 % Physikalische Parameter
 rho = 1.27;        % Dichte [kg/m^3]
-delta_rho = 6900;  % Dichtedifferenz [kg/m^3]
+delta_rho = 7900;  % Dichtedifferenz [kg/m^3]
 sigma = 0.072;     % Oberflächenspannung [N/m]
 g = 9.81;          % Erdbeschleunigung [m/s^2]
 v = 0.5;           % Geschwindigkeit [m/s]
