@@ -9,8 +9,8 @@ L = 1e-3;          % charakteristische Länge [m]
 v = linspace(0.01, 5, 100);
 
 % Reynolds- und Weber-Zahl
-Re = rho .* v .* L ./ mu;       % Trägheitskräfte zu viskosen Kräften
-We = rho .* v.^2 .* L ./ sigma; % Trägheitskräften zu Oberflächenspannungskräften
+Re = rho .* v .* L ./ mu;       % Trägheitskräfte zu viskosen Kräfte
+We = rho .* v.^2 .* L ./ sigma; % Trägheitskräfte zu Oberflächenspannungskräfte
 
 % Plot
 figure
