@@ -13,7 +13,7 @@ dp = i * 1e-6;     % Partikeldurchmesser [m]
 db = i * 1e-4;     % Blasendurchmesser [m]
 
 % Kennzahlen
-St  = rho_p .* dp.^2 .* Ub ./ (18 * mu * L);
+St  = rho_p .* dp.^2 .* Ub ./ (18 * mu * L); & Partikelträgheit zur Strömungsgeschwindigkeit des Fluids
 Reb = Ub .* db .* rho_b ./ mu;
 
 % Verhältnis
