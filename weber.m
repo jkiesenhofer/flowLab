@@ -1,5 +1,5 @@
 % Parameter
-rho = 1000;        % Dichte [kg/m^3]
+rho = 7900;        % Dichte [kg/m^3]
 mu = 1e-3;         % dyn. Viskosität [Pa s]
 sigma = 0.072;     % Oberflächenspannung [N/m]
 L = 1e-3;          % charakteristische Länge [m]
