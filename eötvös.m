@@ -1,7 +1,7 @@
 % Konstanten
 rho_l = 1000;      % Dichte Flüssigkeit [kg/m^3]
 rho_g = 1.2;       % Dichte Gas [kg/m^3]
-rho_p = 1000;      % Partikeldichte [kg/m^3]
+rho_p = 7900;      % Partikeldichte [kg/m^3]
 g = 9.81;          % Erdbeschleunigung [m/s^2]
 sigma = 0.072;     % Oberflächenspannung [N/m]
 mu = 1e-3;         % dynamische Viskosität [Pa s]
