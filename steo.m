@@ -15,7 +15,7 @@ Eo = (rho_l - rho_g) .* g .* d.^2 ./ sigma; % Gravitationskräfte zu Oberfläche
 
 % Stokeszahl
 tau_p = rho_p .* d.^2 ./ (18 * mu);
-St = tau_p ./ tau_f;
+St = tau_p ./ tau_f     % Partikelträgheit zur Strömungsgeschwindigkeit des Fluids
 
 % Plot
 figure
