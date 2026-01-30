@@ -8,7 +8,7 @@ dx = Lx/(nx-1);
 dy = Ly/(ny-1);
 
 % Parameter
-rho = 7900;
+rho = 1000;
 nu = 1e-1;
 dt = 0.001;
 nt = 500;
@@ -38,12 +38,23 @@ for n = 1:nt
         + dt/dy^2 * (vn(3:end,2:end-1) - 2*vn(2:end-1,2:end-1) + vn(1:end-2,2:end-1)));
 
     % Boundaries (Cavity)
-    u(:,1) = 2; u(:,end) = 5;
+    u(:,1) = 2; u(:,end) = rand;
     u(1,:) = 3; u(end,:) = 0;
-    v(:,1) = 2;
-    u(1,:) = 0; u(end,:) = 0;
+    v(:,1) = 8;
+    p(1,:) = 0; p(end,:) = 0;
 end
 speed = sqrt(u.^2 + v.^2);
-contourf(rho * speed .* Lx / nu)
+Re=rho * speed .* Lx / nu;
+
+%Re=Re/max(max(Re));
+
+subplot(1,2,1)
+contourf(Re)
+colorbar
 xlabel('x')
 ylabel('y')
+
+subplot(1,2,2)
+quiver(u,v)
+xlim([0 nx])
+ylim([0 ny])
