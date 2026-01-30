@@ -13,7 +13,7 @@ nt = 1000
 
 # Parameter
 nu = 0.01  # Viskosität
-
+rho = 1000
 # Felder
 u = np.zeros((nx, ny))
 v = np.zeros((nx, ny))
@@ -63,15 +63,15 @@ for n in range(nt):
     v = v_star - dt * (np.roll(p, -1, axis=1) - p) / dy
 
 
-speed = np.sqrt(u**2 + v**2)
+speed = np.transpose(np.sqrt(u**2 + v**2))
 
 x = np.linspace(0, Lx, nx)
 y = np.linspace(0, Ly, ny)
 X, Y = np.meshgrid(x, y)
-
+Re=rho * speed.T * Lx / nu;
 plt.figure(figsize=(6, 5))
-contour = plt.contourf(X, Y, speed.T, levels=50, cmap="viridis")
-plt.colorbar(contour, label="Geschwindigkeit |u|")
+contour = plt.contourf(X, Y, Re, levels=50, cmap="viridis")
+plt.colorbar(contour, label="Re")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.tight_layout()
