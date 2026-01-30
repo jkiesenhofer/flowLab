@@ -11,8 +11,7 @@ v = -sin(x) + 0.5*sin(3*y).*cos(2*x)+rand;
 speed = sqrt(u.^2 + v.^2);
 Re = rho * speed .* L / mu; % Trägheitskräfte zu viskosen Kräfte
 
-
-Fr = speed ./ sqrt(g .* L);
+Fr = speed ./ sqrt(g .* L);  % Trägheitskräfte zu Schwerekräfte
 
 figure
 imagesc(x(1,:), y(:,1), Fr)
