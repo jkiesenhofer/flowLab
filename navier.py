@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-# Gitter
+# Grid
 nx, ny = 64, 64
 Lx, Ly = 1.0, 1.0
 dx = Lx / nx
