@@ -1,18 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-# Gitter
+
+# Grid
 nx, ny = 64, 64
 Lx, Ly = 1.0, 1.0
 dx = Lx / nx
 dy = Ly / ny
 
-# Zeit
+# Time
 dt = 0.001
 nt = 1000
 
 # Parameter
-nu = 0.01  # Viskosität
+nu = 0.01 
 rho = 1000
 # Felder
 u = np.zeros((nx, ny))
@@ -40,7 +41,7 @@ def pressure_poisson(p, rhs, iters=50):
         ) / (2 * (dx**2 + dy**2))
     return p
 
-# Anfangsstörung
+# Initial distortion
 u[30:34, 30:34] = random.random()
 
 for n in range(nt):
