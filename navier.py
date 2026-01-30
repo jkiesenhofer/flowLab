@@ -14,7 +14,7 @@ nt = 1000
 # Parameter
 nu = 0.01 
 rho = 1000
-# Felder
+# Fields
 u = np.zeros((nx, ny))
 v = np.zeros((nx, ny))
 p = np.zeros((nx, ny))
