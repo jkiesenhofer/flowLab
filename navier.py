@@ -1,20 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-# Grid
+# Gitter
 nx, ny = 64, 64
 Lx, Ly = 1.0, 1.0
 dx = Lx / nx
 dy = Ly / ny
 
-# Time
+# Zeit
 dt = 0.001
 nt = 1000
 
 # Parameter
-nu = 0.01 
+nu = 0.01  # Viskosität
 rho = 1000
-# Fields
+# Felder
 u = np.zeros((nx, ny))
 v = np.zeros((nx, ny))
 p = np.zeros((nx, ny))
@@ -71,8 +71,8 @@ y = np.linspace(0, Ly, ny)
 X, Y = np.meshgrid(x, y)
 Re=rho * speed.T * Lx / nu;
 plt.figure(figsize=(6, 5))
-contour = plt.contourf(X, Y, compressibility)
-plt.colorbar(contour, label="div(v)")
+contour = plt.contourf(X, Y, p)
+plt.colorbar(contour, label="p")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.tight_layout()
