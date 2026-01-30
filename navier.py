@@ -64,7 +64,7 @@ for n in range(nt):
 
 
 speed = np.transpose(np.sqrt(u**2 + v**2))
-
+#compressibility=divergence(u,v)
 x = np.linspace(0, Lx, nx)
 y = np.linspace(0, Ly, ny)
 X, Y = np.meshgrid(x, y)
