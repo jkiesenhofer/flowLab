@@ -8,15 +8,15 @@ dx = Lx/(nx-1);
 dy = Ly/(ny-1);
 
 % Parameter
-rho = 7900;
-nu = 1e-2;
+rho = 1000;
+nu = 1e-3;
 dt = 0.001;
-nt = 100;
+nt = 8;
 
 % Fields
 u = zeros(ny,nx);
 v = zeros(ny,nx);
-p = zeros(ny,nx);
+p = ones(ny,nx)*1e+5;
 
 for n = 1:nt
     un = u;
@@ -38,10 +38,12 @@ for n = 1:nt
         + dt/dy^2 * (vn(3:end,2:end-1) - 2*vn(2:end-1,2:end-1) + vn(1:end-2,2:end-1)));
 
     % Boundaries
-    %u(20,20) = 2; u(:,end) = rand;
-    u(20,5:25) = 7*rand;% u(end,:) = rand;
-    v(20:25,20) = 7*rand;
-    %p(1,:) = rand; p(end,:) = rand;
+    u(20:end,end-20) = -2;
+    %v(25:30,17:25) = 7; % m/s
+    %v(:,end-20:end) = 7;
+    %p(17:25,17:25) = 2e+5;% p(end,:) = rand; N/m^2
+    p(17:25,17:25) = 1.3e+5;
+    %p(10:15,10:15) = rand;
 end
 speed = sqrt(u.^2 + v.^2);
 Re=rho * speed .* Lx / nu;
@@ -55,11 +57,11 @@ div = u./dx + v./dy;
 %ylabel('y')
 
 %subplot(1,2,2)
-surf(Re)
+contourf(speed)
 %quiver(u,v)
 xlim([0 nx])
 ylim([0 ny])
 colorbar
 xlabel('x')
 ylabel('y')
-zlabel('Re')
+axis equal
