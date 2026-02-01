@@ -43,7 +43,7 @@ for n = 1:nt
 
 speed = sqrt(u.^2 + v.^2);
 Re=rho * speed .* Lx / nu;
-divU = u./dx + v./dy;
+[dudx, dudy] = gradient(u, dx, dy);
 
 contourf(speed)
 %quiver(u,v)
