@@ -11,7 +11,7 @@ dy = Ly/(ny-1);
 rho = 1000; % kg/m^3
 nu = 1e-3;
 dt = 0.001;
-nt = 8;
+nt = 18;
 
 % Fields
 u = zeros(ny,nx);
@@ -39,7 +39,7 @@ for n = 1:nt
 
     % Boundaries
     v(26:end,end-20) = -5;
-    p(17:25,17:25) = 1.1e+5;
+    p(17:25,17:25) = 0.95e+5;
 
 end
 
@@ -47,7 +47,7 @@ speed = sqrt(u.^2 + v.^2);
 Re=rho * speed .* Lx / nu;
 divU = u./dx + v./dy;
 
-contourf(speed)
+contourf(divU)
 %quiver(u,v)
 xlim([0 nx])
 ylim([0 ny])
