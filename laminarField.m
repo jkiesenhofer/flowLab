@@ -9,6 +9,7 @@ dy = Ly/(ny-1);
 
 % Parameter
 rho = 1000; % kg/m^3
+rho_l = 1; % kg/m^3
 nu = 1e-3;
 dt = 0.001;
 nt = 18;
@@ -35,7 +36,8 @@ for n = 1:nt
         - dt/dy * vn(2:end-1,2:end-1) .* (vn(2:end-1,2:end-1) - vn(1:end-2,2:end-1)) ...
         - dt/(2*rho*dy) * (p(3:end,2:end-1) - p(1:end-2,2:end-1)) ...
         + nu * (dt/dx^2 * (vn(2:end-1,3:end) - 2*vn(2:end-1,2:end-1) + vn(2:end-1,1:end-2)) ...
-        + dt/dy^2 * (vn(3:end,2:end-1) - 2*vn(2:end-1,2:end-1) + vn(1:end-2,2:end-1)));
+        + dt/dy^2 * (vn(3:end,2:end-1) - 2*vn(2:end-1,2:end-1) + vn(1:end-2,2:end-1)))...
+        + dt * g * (rho_l - rho)./rho_l;
 
     % Boundaries
     v(26:end,end-20) = -5;
