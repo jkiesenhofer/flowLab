@@ -16,7 +16,7 @@ steps = 2000
 # -------------------------
 phi = 0.05 * np.random.randn(Nx, Ny)
 
-# Laplace-Operator (periodische RB)
+# Laplace-Operator (periodic)
 def laplace(f):
     return (
         np.roll(f, 1, axis=0) +
