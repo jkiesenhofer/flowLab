@@ -3,8 +3,8 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-NUM = 25
-RADIUS = 0.15
+NUM = 80
+RADIUS = 0.1
 DT = 0.02
 GRAVITY = -9.81
 K = 300          
@@ -27,7 +27,6 @@ def distance(p1, p2):
     return math.hypot(dx, dy), dx, dy
 
 def update_physics():
-    # Gravitation
     for p in particles:
         p["vy"] += GRAVITY * DT
 
