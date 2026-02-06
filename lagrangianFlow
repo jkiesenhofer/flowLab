@@ -1,0 +1,82 @@
+import random
+import math
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+NUM = 25
+RADIUS = 0.15
+DT = 0.02
+GRAVITY = -9.81
+K = 300          
+DAMPING = 0.3  
+WIDTH = 5
+HEIGHT = 5
+
+particles = []
+for _ in range(NUM):
+    particles.append({
+        "x": random.uniform(1, WIDTH - 1),
+        "y": random.uniform(3, HEIGHT),
+        "vx": 0.0,
+        "vy": 0.0
+    })
+
+def distance(p1, p2):
+    dx = p2["x"] - p1["x"]
+    dy = p2["y"] - p1["y"]
+    return math.hypot(dx, dy), dx, dy
+
+def update_physics():
+    # Gravitation
+    for p in particles:
+        p["vy"] += GRAVITY * DT
+
+    for i in range(NUM):
+        for j in range(i + 1, NUM):
+            p1, p2 = particles[i], particles[j]
+            dist, dx, dy = distance(p1, p2)
+
+            min_dist = 2 * RADIUS
+            if dist < min_dist and dist > 0:
+                overlap = min_dist - dist
+                nx, ny = dx / dist, dy / dist
+
+                force = K * overlap
+                fx = force * nx
+                fy = force * ny
+
+                p1["vx"] -= fx * DT
+                p1["vy"] -= fy * DT
+                p2["vx"] += fx * DT
+                p2["vy"] += fy * DT
+
+    for p in particles:
+        p["x"] += p["vx"] * DT
+        p["y"] += p["vy"] * DT
+
+
+        if p["y"] < RADIUS:
+            p["y"] = RADIUS
+            p["vy"] *= -DAMPING
+
+
+        if p["x"] < RADIUS or p["x"] > WIDTH - RADIUS:
+            p["vx"] *= -DAMPING
+            p["x"] = max(RADIUS, min(WIDTH - RADIUS, p["x"]))
+
+fig, ax = plt.subplots()
+ax.set_xlim(0, WIDTH)
+ax.set_ylim(0, HEIGHT)
+ax.set_aspect("equal")
+
+scat = ax.scatter([], [], s=(RADIUS * 300)**2)
+
+def animate(frame):
+    update_physics()
+    x = [p["x"] for p in particles]
+    y = [p["y"] for p in particles]
+    scat.set_offsets(list(zip(x, y)))
+    return scat,
+
+ani = FuncAnimation(fig, animate, frames=600, interval=20)
+plt.show()
