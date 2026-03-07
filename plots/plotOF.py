@@ -13,21 +13,21 @@ plt.rcParams.update({
 })
 
 # Load CSV file
-df = pd.read_csv("pointData.csv")
+df = pd.read_csv("p_rhg0.csv")
 
 # Compute mean
-mean_val = df["velocity_Magnitude"].mean()
+mean_val = df["p_rgh"].mean()
 
 # Plot histogram
-plt.hist(df["velocity_Magnitude"], bins=16, color="skyblue", edgecolor="black")
+plt.hist(df["p_rgh"].sort_values())
 
 # Add mean line
 plt.axvline(mean_val, color='red', linestyle='dashed', linewidth=2, label=f'Mean = {mean_val:.2f}')
 
 # Labels and title using LaTeX
-plt.xlabel(r"\textbf{Velocity Magnitude} (\textit{m/s})")
-plt.ylabel(r"\textbf{Incidences}")
-plt.title(r"\textbf{Distribution of Velocity Magnitude}")
+plt.xlabel(r"\textbf{Hydrostatic pressure } (\textit{$\frac{kg}{ms^2}$})")
+plt.ylabel(r"\textbf{Cells}")
+plt.title(r"\textbf{Hydrostatic pressure contribution}")
 
 # Rotate x-ticks for readability
 plt.xticks(rotation=45)
