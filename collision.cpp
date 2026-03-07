@@ -37,6 +37,12 @@ public:
         double nx = dx / dist;
         double ny = dy / dist;
 
+        double* a = nullptr;
+        double* b = nullptr;
+
+        a++;
+        b++;
+
         double dvx = other.vx - vx;
         double dvy = other.vy - vy;
 
