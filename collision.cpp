@@ -1,69 +1,86 @@
 #include <iostream>
 #include <cmath>
 
-struct Particle {
+class Body {
+public:
     double x, y;
     double vx, vy;
     double mass;
     double radius;
+
+    Body(double x, double y, double vx, double vy, double m, double r)
+        : x(x), y(y), vx(vx), vy(vy), mass(m), radius(r) {}
+
+    virtual ~Body() {}
+
+    virtual void update(double dt) {
+        x += vx * dt;
+        y += vy * dt;
+    }
+
+    virtual void resolveCollision(Body& other) = 0;
 };
 
-double distance(Particle &a, Particle &b)
-{
-    return std::sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y));
+class Particle : public Body {
+public:
+    Particle(double x, double y, double vx, double vy, double m, double r)
+        : Body(x, y, vx, vy, m, r) {}
+
+    void resolveCollision(Body& other) override {
+
+        double dx = other.x - x;
+        double dy = other.y - y;
+        double dist = std::sqrt(dx*dx + dy*dy);
+
+        if (dist == 0) return;
+
+        double nx = dx / dist;
+        double ny = dy / dist;
+
+        double dvx = other.vx - vx;
+        double dvy = other.vy - vy;
+
+        double relVel = dvx * nx + dvy * ny;
+
+        if (relVel > 0) return;
+
+        double restitution = 1.0;
+
+        double j = -(1 + restitution) * relVel;
+        j /= (1/mass + 1/other.mass);
+
+        double impulseX = j * nx;
+        double impulseY = j * ny;
+
+        vx -= impulseX / mass;
+        vy -= impulseY / mass;
+
+        other.vx += impulseX / other.mass;
+        other.vy += impulseY / other.mass;
+    }
+};
+
+double distance(Body& a, Body& b) {
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return std::sqrt(dx*dx + dy*dy);
 }
 
-void resolveCollision(Particle &a, Particle &b)
-{
-    double dx = b.x - a.x;
-    double dy = b.y - a.y;
-    double dist = std::sqrt(dx*dx + dy*dy);
+int main() {
 
-    if (dist == 0) return;
-
-    double nx = dx/dist;
-    double ny = dy/dist;
-
-    double dvx = a.vx - b.vx;
-    double dvy = a.vy - b.vy;
-
-    double relVel = dvx*nx + dvy*ny;
-
-    if (relVel > 0) return;
-
-    double e = 1.0; // restitution (1 = elastic)
-
-    double j = -(1+e)*relVel;
-    j /= (1/a.mass + 1/b.mass);
-
-    double impulseX = j*nx;
-    double impulseY = j*ny;
-
-    a.vx += impulseX/a.mass;
-    a.vy += impulseY/a.mass;
-
-    b.vx -= impulseX/b.mass;
-    b.vy -= impulseY/b.mass;
-}
-
-int main()
-{
-    Particle p1{0,0,1,0,1,0.5};
-    Particle p2{5,0,-1,0,1,0.5};
+    Particle p1(0,0,1,0,1,0.5);
+    Particle p2(5,0,-1,0,1,0.5);
 
     double dt = 0.01;
 
-    for(int step=0; step<500; step++)
+    for(int step=0; step<100; step++)
     {
-        p1.x += p1.vx*dt;
-        p1.y += p1.vy*dt;
-
-        p2.x += p2.vx*dt;
-        p2.y += p2.vy*dt;
+        p1.update(dt);
+        p2.update(dt);
 
         if(distance(p1,p2) <= p1.radius + p2.radius)
         {
-            resolveCollision(p1,p2);
+            p1.resolveCollision(p2);
         }
 
         std::cout << "Step " << step
