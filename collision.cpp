@@ -22,6 +22,8 @@ public:
 };
 
 class Particle : public Bubble {
+private:
+      std::string d;
 public:
     Particle(double x, double y, double vx, double vy, double m, double r)
         : Bubble(x, y, vx, vy, m, r) {}
