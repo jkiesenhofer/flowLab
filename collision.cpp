@@ -1,32 +1,32 @@
 #include <iostream>
 #include <cmath>
 
-class Body {
+class Bubble {
 public:
     double x, y;
     double vx, vy;
     double mass;
     double radius;
 
-    Body(double x, double y, double vx, double vy, double m, double r)
+    Bubble(double x, double y, double vx, double vy, double m, double r)
         : x(x), y(y), vx(vx), vy(vy), mass(m), radius(r) {}
 
-    virtual ~Body() {}
+    virtual ~Bubble() {}
 
     virtual void update(double dt) {
         x += vx * dt;
         y += vy * dt;
     }
 
-    virtual void resolveCollision(Body& other) = 0;
+    virtual void resolveCollision(Bubble& other) = 0;
 };
 
-class Particle : public Body {
+class Particle : public Bubble {
 public:
     Particle(double x, double y, double vx, double vy, double m, double r)
-        : Body(x, y, vx, vy, m, r) {}
+        : Bubble(x, y, vx, vy, m, r) {}
 
-    void resolveCollision(Body& other) override {
+    void resolveCollision(Bubble& other) override {
 
         double dx = other.x - x;
         double dy = other.y - y;
@@ -60,7 +60,7 @@ public:
     }
 };
 
-double distance(Body& a, Body& b) {
+double distance(Bubble& a, Bubble& b) {
     double dx = a.x - b.x;
     double dy = a.y - b.y;
     return std::sqrt(dx*dx + dy*dy);
