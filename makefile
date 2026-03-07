@@ -1,8 +1,8 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -O2 -Wall
 
-TARGET = collision
-SRC = collision.cpp
+TARGET = triangulation
+SRC = triangulation.cpp
 
 all: $(TARGET)
 
