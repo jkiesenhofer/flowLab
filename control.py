@@ -10,7 +10,7 @@ ser = serial.Serial(
 
 time.sleep(2)
 
-# example command
+# reset command
 command = b'/1ZR\r'   # reset syringe drive
 ser.write(command)
 
@@ -23,7 +23,7 @@ def move_pump(steps):
     response = ser.readline().decode().strip()
     print("Pump response:", response)
 
-# Example: move 500 steps
+# move 500 steps
 move_pump(500)
 
 status_command = b'/1TS\r'  # 'TS' = Trigger Status
