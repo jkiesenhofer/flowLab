@@ -1,40 +1,30 @@
 #!/bin/bash
 
-# Serial device
 DEVICE="/dev/ttyUSB0"
 BAUD=9600
 
-# Configure the serial port: 8N1, no parity, no echo
-stty -F $DEVICE $BAUD cs8 -cstopb -parenb -echo
+# Configure serial port: 8N1, no parity, raw mode
+stty -F $DEVICE $BAUD cs8 -cstopb -parenb -echo raw
 
-# Function to send command and optionally wait
 send_cmd() {
     echo -ne "$1\r" > $DEVICE
     echo "Sent: $1"
 }
 
+read_response() {
+    # Read up to 100 bytes or 1 second
+    RESPONSE=$(timeout 1 cat $DEVICE)
+    echo "Pump response: '$RESPONSE'"
+}
+
 # Reset pump
 send_cmd "/1ZR"
 sleep 2
+read_response
 
 # Check status
 send_cmd "/1TS"
 sleep 1
+read_response
 
-# Move pump to 0 steps
-send_cmd "/1MA0"
-sleep 1
-
-# Move pump to 100 steps
-send_cmd "/1MA100"
-sleep 1
-
-# Move pump to 200 steps
-send_cmd "/1MA200"
-sleep 1
-
-# Move pump back to 0
-send_cmd "/1MA0"
-sleep 1
-
-echo "Test sequence complete."
+echo "Pump status check complete."
