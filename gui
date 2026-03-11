@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Simple Zenity GUI for OpenFOAM scripts
+
+ACTION=$(zenity --list \
+    --title="OpenFOAM Case Launcher" \
+    --text="Select an action:" \
+    --column="Action" "Run Allrun" "Run Allclean" \
+    --height=200 \
+    --width=300)
+
+# Exit if user closes dialog
+if [ -z "$ACTION" ]; then
+    exit
+fi
+
+# Run selected script
+case $ACTION in
+    "Run Allrun")
+        if [ -x "./Allrun" ]; then
+            zenity --info --text="Starting Allrun..."
+            ./Allrun
+            zenity --info --text="Allrun finished!"
+        else
+            zenity --error --text="Allrun not found or not executable!"
+        fi
+        ;;
+    "Run Allclean")
+        if [ -x "./Allclean" ]; then
+            zenity --info --text="Starting Allclean..."
+            ./Allclean
+            zenity --info --text="Allclean finished!"
+        else
+            zenity --error --text="Allclean not found or not executable!"
+        fi
+        ;;
+esac
