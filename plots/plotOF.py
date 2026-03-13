@@ -39,7 +39,7 @@ print(f"Lineare Funktion: y = {m:.2f}*x + {b:.2f}")
 # Fit-Linie für Plot erstellen
 y_fit = m * x + b + c * x**2 + a*x**3
 plt.scatter(x,y, marker='.')
-plt.plot(x, y_fit, color='red', label='Lineare Ausgleichsfunktion')
+plt.plot(x, y_fit, color='red', label='Ausgleichsfunktion')
 # Lineares Fit: y = m*x + b
 
 
