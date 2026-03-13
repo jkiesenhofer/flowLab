@@ -13,24 +13,31 @@ plt.rcParams.update({
 })
 
 # Load CSV file
-df = pd.read_csv("p_rhg0.csv")
+df = pd.read_csv("OF/flotation_10/data.csv")
 
 # Compute mean
 mean_val = df["p_rgh"].mean()
-
+''''
 # Plot histogram
 plt.hist(df["p_rgh"].sort_values())
 
 # Add mean line
 plt.axvline(mean_val, color='red', linestyle='dashed', linewidth=2, label=f'Mean = {mean_val:.2f}')
+'''
+
+x = df["Cell ID"]
+y = df["U.water_Magnitude"]
+
+plt.scatter(x,y, marker='x')
+
 
 # Labels and title using LaTeX
-plt.xlabel(r"\textbf{Hydrostatic pressure } (\textit{$\frac{kg}{ms^2}$})")
-plt.ylabel(r"\textbf{Cells}")
+plt.xlabel(r"\textbf{Cell ID}")
+plt.ylabel(r"\textbf{$U_f$}")
 plt.title(r"\textbf{Hydrostatic pressure contribution}")
 
 # Rotate x-ticks for readability
-plt.xticks(rotation=45)
+plt.xticks(rotation=0)
 plt.legend()
 plt.tight_layout()
 plt.show()
