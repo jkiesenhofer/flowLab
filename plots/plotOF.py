@@ -29,20 +29,15 @@ plt.axvline(mean_val, color='red', linestyle='dashed', linewidth=2, label=f'Mean
 x = df["Cell ID"]
 y = df["U.water_Magnitude"]
 
-
 coeffs = np.polyfit(x, y, deg=3)  # deg=1 für linear
 a, c, m, b = coeffs
 print(f"Lineare Funktion: y = {m:.2f}*x + {b:.2f}")
 
-
-
 # Fit-Linie für Plot erstellen
 y_fit = m * x + b + c * x**2 + a*x**3
 plt.scatter(x,y, marker='.')
-plt.plot(x, y_fit, color='green', label='Kubische Ausgleichsfunktion')
+plt.plot(x, y_fit, color='black', label='Kubische Ausgleichsfunktion')
 # Lineares Fit: y = m*x + b
-
-
 
 # Labels and title using LaTeX
 plt.xlabel(r"\textbf{Cell ID}")
