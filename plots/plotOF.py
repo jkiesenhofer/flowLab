@@ -26,8 +26,8 @@ plt.hist(df["p_rgh"].sort_values())
 plt.axvline(mean_val, color='red', linestyle='dashed', linewidth=2, label=f'Mean = {mean_val:.2f}')
 '''
 
-x = df["Cell ID"]
-y = df["U.water_Magnitude"]
+x = df["Cell ID"]/max(df["Cell ID"])
+y = df["U.water_Magnitude"]*1000
 
 coeffs = np.polyfit(x, y, deg=3)  # deg=1 für linear
 a, c, m, b = coeffs
@@ -36,12 +36,12 @@ print(f"Lineare Funktion: y = {m:.2f}*x + {b:.2f}")
 # Fit-Linie für Plot erstellen
 y_fit = m * x + b + c * x**2 + a*x**3
 plt.scatter(x,y, marker='.')
-plt.plot(x, y_fit, color='black', label='Kubische Ausgleichsfunktion')
+plt.plot(x, y_fit, color='black', label='Cubic interpolation function')
 # Lineares Fit: y = m*x + b
 
 # Labels and title using LaTeX
-plt.xlabel(r"\textbf{Cell ID}")
-plt.ylabel(r"\textbf{U}")
+plt.xlabel(r"\textbf{$\tilde{x}$}")
+plt.ylabel(r"Re")
 #plt.title(r"\textbf{Hydrostatic pressure contribution}")
 
 # Rotate x-ticks for readability
