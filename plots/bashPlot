@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+gnuplot <<EOF
+set datafile separator ','
+set terminal pngcairo size 1000,600
+set output "alpha_water_vs_prgh.png"
+
+# set title "alpha.water vs p_rgh"
+set xlabel "Cell"
+set ylabel "U_f"
+set grid
+
+plot "data.csv" using "Cell ID":"U.water_Magnitude" with linespoints title "OF"
+EOF
