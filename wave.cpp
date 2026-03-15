@@ -13,7 +13,7 @@ int main() {
     // Find max and min for scaling
     double maxVal = -1e9, minVal = 1e9;
     std::list<int> myList = {1, 2, 3, 4, 5};
-    double width[3] = {10.5, 20.75, 30.0};
+    double width2[3] = {10.5, 20.75, 30.0};
     for (int x = 0; x < width; ++x) {
         double angle = (double)x / width * 10 * pi;  // choose scale to show enough cycles
         double y = 2 * sin(angle) - 5 * sin(0.8 * angle);
