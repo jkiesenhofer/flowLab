@@ -12,6 +12,10 @@ int dyn::value2 = 0;
 
 int main() {
     std::unordered_map<std::string, int> dict;
+    auto add = [](int a, int b) {
+        return a+b;
+    };
+    int result = add(5,3);
     dict["laminar"] = 300;
     dict["transition"] = 500;
     dict["turbulent"] = 2000;
@@ -53,6 +57,6 @@ int main() {
     //std::cout << "#################################";
     //std::cout << "#################################"<< std::endl;
     //dyn::value2 = 10;
-    std::cout << dyn::value2;
+    std::cout << "Sum: " << result << std::endl;
     return 0;
 }
