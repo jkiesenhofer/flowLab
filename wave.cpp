@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iomanip>
 #include <list>
+#include <unordered_map>
 
 class dyn {
     public:
@@ -10,6 +11,10 @@ class dyn {
 int dyn::value2 = 0;
 
 int main() {
+    std::unordered_map<std::string, int> dict;
+    dict["laminar"] = 300;
+    dict["transition"] = 500;
+    dict["turbulent"] = 2000;
     const int width = 100;   // horizontal size of the graph
     const int height = 25;   // vertical size of the graph
     const double pi = 3.14159265358979323846;
