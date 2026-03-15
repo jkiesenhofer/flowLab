@@ -7,7 +7,7 @@ class dyn {
     private:
         static int value2;
     };
-    int dyn::value2 = 0;
+int dyn::value2 = 0;
 
 int main() {
     const int width = 100;   // horizontal size of the graph
