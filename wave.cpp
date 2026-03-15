@@ -4,7 +4,7 @@
 #include <list>
 
 class dyn {
-    private:
+    public:
         static int value2;
     };
 int dyn::value2 = 0;
@@ -43,10 +43,11 @@ int main() {
             }
         }
         std::cout << std::endl;
-        
     }
     //std::cout << "#################################";
     //std::cout << "#################################";
     //std::cout << "#################################"<< std::endl;
+    //dyn::value2 = 10;
+    std::cout << dyn::value2;
     return 0;
 }
