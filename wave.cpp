@@ -15,6 +15,11 @@ int main() {
     std::list<int> myList = {1, 2, 3, 4, 5};
     int* ptr = nullptr;
     static int value = 10;
+    class dyn {
+        public:
+            static int value;
+        };
+    int dyn::value = 0;
     double width2[3] = {10.5, 20.75, 30.0};
     for (int x = 0; x < width; ++x) {
         double angle = (double)x / width * 10 * pi;  // choose scale to show enough cycles
