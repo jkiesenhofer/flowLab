@@ -1,22 +1,37 @@
 import cv2
-import numpy as np
+import csv
+import time
 
-# Step 1: Load the image
-image = cv2.imread('input.jpg')  # Replace with your image file path
+cap = cv2.VideoCapture("coarseCollision.mp4")
 
-# Step 2: Convert to grayscale (brightness is easier to handle in a single channel)
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+with open("brightest_points.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    
+    # header
+    writer.writerow(["frame", "x", "y", "brightness"])
 
-# Step 3: Find the brightest point
-(minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
+    frame_id = 0
 
-print(f"Brightest value: {maxVal} at position {maxLoc}")
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        # convert to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # find brightest pixel
+        minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
+        x, y = maxLoc
+        time.sleep(0.2) 
+        # write to CSV
+        writer.writerow([frame_id, x, y, maxVal])
+        # (optional) show it
+        cv2.circle(frame, (x, y), 5, (0, 0, 255), -1)
+        cv2.imshow("Brightest Point", frame)
 
-# Step 4: Draw a circle on the brightest point
-result = image.copy()
-cv2.circle(result, maxLoc, 10, (0, 0, 255), 2)  # Red circle
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-# Step 5: Display the result
-cv2.imshow("Brightest Point", result)
-cv2.waitKey(0)
+        frame_id += 1
+
+cap.release()
 cv2.destroyAllWindows()
