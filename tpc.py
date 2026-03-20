@@ -34,7 +34,7 @@ phi_total += potential_monopole(monopole2["Q"], monopole2["pos"][0], monopole2["
 plt.figure(figsize=(10, 6))
 contours = plt.contour(X, Y, phi_total, levels=50, cmap='plasma')
 plt.clabel(contours, inline=True, fontsize=8)
-plt.title("Contour Plot of Two Asymmetric Monopoles")
+plt.title("Two asymmetric monopoles")
 plt.xlabel("x")
 plt.ylabel("y")
 plt.scatter([monopole1["pos"][0], monopole2["pos"][0]],
