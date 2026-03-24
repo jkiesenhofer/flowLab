@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 # https://doi.org/10.1016/S0301-7516(97)00073-2
-# Generate x values from 0 to 0.5 pi
 
 # Enable LaTeX-style fonts
 plt.rcParams.update({
@@ -16,7 +15,7 @@ plt.rcParams.update({
 })
 
 np.cot = lambda x: 1 / np.tan(x)
-
+# Generate x values from 0 to 0.5 pi
 phim = np.linspace(1e-6, 0.5 * np.pi, 500)  # 500 points for smooth curve
 phi0 = 10*np.pi/180
 Db = 0.001 
