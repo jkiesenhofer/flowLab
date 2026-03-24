@@ -9,9 +9,9 @@ plt.rcParams.update({
     "text.usetex": True,
     "font.family": "serif",
     "font.serif": ["Computer Modern Roman"],
-    "axes.labelsize": 14,
-    "xtick.labelsize": 12,
-    "ytick.labelsize": 12,
+    "axes.labelsize": 16,
+    "xtick.labelsize": 16,
+    "ytick.labelsize": 16,
     "axes.titlesize": 16
 })
 
@@ -44,11 +44,11 @@ np.log((np.tan(phim/2)/np.tan(phi0/2))*
 # Plot
 plt.plot(ts, phim*90/np.pi, label='ts', color='blue')
 #plt.title('Bubble–particle collision and attachment')
-plt.xlabel('Approaching angle ')
-plt.ylabel('Induction time in s')
+plt.xlabel('Induction time $t_s$')
+plt.ylabel('Approaching angle $\phi$')
 plt.grid(True)
 plt.legend()
-#plt.ylim(0, max(ts))
+plt.xlim(0, max(ts))
 plt.show()
 
 #plt.savefig("plot.png")
