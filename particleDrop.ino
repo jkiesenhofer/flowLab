@@ -1,14 +1,17 @@
-// Pin 13 has the built-in LED
-const int ledPin = 13;
+#include <Stepper.h>
+
+const int stepsPerRevolution = 2048;  // 28BYJ-48
+
+Stepper myStepper(stepsPerRevolution, 9, 11, 10, 12);
 
 void setup() {
-  // Set LED pin as output
-  pinMode(ledPin, OUTPUT);
+  myStepper.setSpeed(10); // RPM
 }
 
 void loop() {
-  digitalWrite(ledPin, HIGH); // Turn LED on
-  delay(1000);                 // Wait 1 second
-  digitalWrite(ledPin, LOW);  // Turn LED off
-  delay(1000);                 // Wait 1 second
+  myStepper.step(stepsPerRevolution);  // eine Umdrehung vorwärts
+  delay(1000);
+
+  myStepper.step(-stepsPerRevolution); // zurück
+  delay(1000);
 }
