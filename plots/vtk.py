@@ -18,10 +18,10 @@ plt.rcParams.update({
 })
 
 # Load the VTK file
-mesh = pv.read("flotation_805.vtk")
+mesh = pv.read("flotation_2_3439.vtk")
 
 # Field to plot
-field_name = "U.air"
+field_name = "U.water"
 if field_name in mesh.point_data:
     data = mesh.point_data[field_name]
 elif field_name in mesh.cell_data:
@@ -34,8 +34,8 @@ if data.ndim == 2:
     data = np.linalg.norm(data, axis=1)
 
 # Coordinates
-x = mesh.points[:,0]#/max(mesh.points[:,0])
-y = mesh.points[:,1]#/max(mesh.points[:,1])
+x = mesh.points[:,0]/max(mesh.points[:,0])
+y = mesh.points[:,1]/max(mesh.points[:,1])
 
 # --- Create a regular grid for contour ---
 xi = np.linspace(x.min(), x.max(), 300)
@@ -45,13 +45,18 @@ X, Y = np.meshgrid(xi, yi)
 # Interpolate scattered data onto grid
 Z = griddata((x, y), data, (X, Y), method='linear')
 
+vmin, vmax = Z.min(), Z.max()
+levels = np.linspace(vmin, vmax, 7)
+# Exclude first level (minimum)
+levels = levels[1:]
+
 # Plot using classic contour
 plt.figure(figsize=(6,6))
-contours = plt.contour(X, Y, Z, levels=7, colors="k")
+contours = plt.contour(X, Y, Z, levels=levels, colors="k")
 plt.clabel(contours, inline=True, fontsize=8)
 plt.xlabel("x")
 plt.ylabel("y")
-plt.title(f"Contour plot of {field_name}")
-plt.axis('equal')          # ensures equal scaling on x and y
+plt.title(f"(a) {field_name}")
+plt.axis('equal') # Ensures equal scaling on x and y
 plt.tight_layout()
 plt.show()
