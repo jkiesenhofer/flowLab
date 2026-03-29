@@ -2,6 +2,8 @@ import pyvista as pv
 import numpy as np
 import matplotlib.pyplot as plt
 
+# run foamToVTK
+
 # Load the VTK file
 mesh = pv.read("flotation_969.vtk")
 
