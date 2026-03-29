@@ -2,6 +2,7 @@ import pyvista as pv
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Run source /opt/openfoam12/etc/bashrc
 # Run foamToVTK
 
 # Load the VTK file
