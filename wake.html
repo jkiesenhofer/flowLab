@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <!-- Load MathJax for LaTeX rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    #equations { font-size: 16px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<div id="equations">
+  <p>Distance from bubble center:</p>
+  <p>\[ r = \sqrt{x^2 + y^2} \]</p>
+
+  <p>Velocity inside bubble:</p>
+  <p>\[
+    \mathbf{u}(x, y, t) = 
+    \begin{cases} 
+      0, & r < a \\
+      \text{outside bubble (see below)}, & r \ge a
+    \end{cases}
+  \]</p>
+
+  <p>Base uniform flow:</p>
+  <p>\[
+    u_\text{base} = 0, \quad v_\text{base} = U
+  \]</p>
+
+  <p>Deflection around bubble (potential-like flow):</p>
+  <p>\[
+    u_\text{deflect} = u_\text{base} \left(1 - \frac{a^2}{r^2}\right), \quad
+    v_\text{deflect} = v_\text{base} - 2 \frac{a^2}{r^2} \frac{x y}{r^2}
+  \]</p>
+
+  <p>Wake region (x > 0, turbulent perturbations):</p>
+  <p>\[
+    f_\text{decay}(y) = e^{-3 y^2}
+  \]</p>
+  <p>\[
+    u_\text{wake} = 0.4 f_\text{decay}(y) \sin(5x - 4t) + 0.2 \sin(12 y + 6 t)
+  \]</p>
+  <p>\[
+    v_\text{wake} = 0.6 f_\text{decay}(y) \cos(5x - 4t) + 0.2 \cos(12 x - 6 t)
+  \]</p>
+
+  <p>Total velocity field:</p>
+  <p>\[
+    \mathbf{u}(x, y, t) =
+    \begin{cases} 
+      0, & r < a \\
+      \begin{bmatrix} u_\text{deflect} + u_\text{wake} \\ v_\text{deflect} + v_\text{wake} \end{bmatrix}, & r \ge a, x > 0 \\
+      \begin{bmatrix} u_\text{deflect} \\ v_\text{deflect} \end{bmatrix}, & r \ge a, x \le 0
+    \end{cases}
+  \]</p>
+</div>
+
+<div id="plot" style="width:800px;height:800px;"></div>
+
+<script>
+// Bubble radius (scaled)
+const a = 0.00025; // m
+const U = 7.5; // m/s
+
+const n = 25;
+const xmin = 0, xmax = 0.001;
+const ymin = 0, ymax = 0.001;
+
+let t = 0;
+
+// Velocity field with turbulent wake
+function velocity(x, y, t) {
+    const r = Math.sqrt(x*x + y*y) + 1e-6;
+
+    if (r < a) return [0, 0];
+
+    let u = 0;
+    let v = U;
+
+    const factor = (a*a)/(r*r);
+    u *= (1 - factor);
+    v += -2 * factor * (x*y)/(r*r);
+
+    if (x > 0) {
+        const decay = Math.exp(-y*y * 3);
+        u += 0.4 * decay * Math.sin(5*x - 4*t);
+        v += 0.6 * decay * Math.cos(5*x - 4*t);
+        u += 0.2 * Math.sin(12*y + 6*t);
+        v += 0.2 * Math.cos(12*x - 6*t);
+    }
+
+    return [u, v];
+}
+
+// Generate field
+function generateField(t) {
+    const lines = [];
+    const scale = 0.12;
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            const xi = xmin + (xmax - xmin) * i / (n - 1);
+            const yj = ymin + (ymax - ymin) * j / (n - 1);
+
+            const [u, v] = velocity(xi, yj, t);
+
+            lines.push({
+                x: [xi, xi + scale * u],
+                y: [yj, yj + scale * v],
+                mode: 'lines',
+                line: { width: 2 },
+                showlegend: false,
+                hoverinfo: 'none'
+            });
+        }
+    }
+
+    return lines;
+}
+
+// Bubble outline
+const bubble = {
+    x: [],
+    y: [],
+    mode: 'lines',
+    line: { color: 'black', width: 3 },
+    showlegend: false
+};
+
+for (let th = 0; th < 2*Math.PI; th += 0.05) {
+    bubble.x.push(a * Math.cos(th));
+    bubble.y.push(a * Math.sin(th));
+}
+
+// Layout
+const layout = {
+    xaxis: { scaleanchor: "y", range: [0, 0.001] },
+    yaxis: { range: [0, 0.001] },
+    showlegend: false
+};
+
+// Animation
+function animate() {
+    t += 0.05;
+    const data = generateField(t);
+    data.push(bubble);
+    Plotly.react('plot', data, layout);
+    requestAnimationFrame(animate);
+}
+
+// Init
+const data = generateField(t);
+data.push(bubble);
+Plotly.newPlot('plot', data, layout);
+animate();
+</script>
+</body>
+</html>
