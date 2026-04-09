@@ -21,7 +21,7 @@ plt.rcParams.update({
 mesh = pv.read("flotation_2_3439.vtk")
 
 # Field to plot
-field_name = "U.water"
+field_name = "mineral"
 if field_name in mesh.point_data:
     data = mesh.point_data[field_name]
 elif field_name in mesh.cell_data:
