@@ -18,7 +18,7 @@ plt.rcParams.update({
 })
 
 # Load the VTK file
-mesh = pv.read("flotation_2_3439.vtk")
+mesh = pv.read("flotation_tpc3_1.vtk")
 
 # Field to plot
 field_name = "mineral"
