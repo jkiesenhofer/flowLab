@@ -1,3 +1,5 @@
+
+
 import re
 import matplotlib.pyplot as plt
 
@@ -5,10 +7,10 @@ plt.rcParams.update({
     "text.usetex": True,
     "font.family": "serif",
     "font.serif": ["Computer Modern Roman"],
-    "axes.labelsize": 26,
+    "axes.labelsize": 16,
     "xtick.labelsize": 16,
     "ytick.labelsize": 16,
-    "axes.titlesize": 16
+    "axes.titlesize": 26
 })
 
 
@@ -43,8 +45,8 @@ def plot_weber_number(file_path):
         plt.plot(normalized_time, weber_values, marker='o', linestyle='-', color='b', markersize=4)
         
         #plt.title('Average Weber Number vs. Normalized Time', fontsize=14)
-        plt.xlabel('$t/t_{end}$', fontsize=12)
-        plt.ylabel('$We$', fontsize=12)
+        plt.xlabel('$t/t_{end}$', fontsize=20)
+        plt.ylabel('$We$', fontsize=20)
         plt.grid(True, linestyle='--', alpha=0.7)
 
         # Adjusted xlim for a 0-1 normalized scale
