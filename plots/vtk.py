@@ -18,10 +18,10 @@ plt.rcParams.update({
 })
 
 # Load the VTK file
-mesh = pv.read("flotation_tpc3_1.vtk")
+mesh = pv.read("FILE_NAME.vtk")
 
 # Field to plot
-field_name = "mineral"
+field_name = "FIELD_NAME"
 if field_name in mesh.point_data:
     data = mesh.point_data[field_name]
 elif field_name in mesh.cell_data:
