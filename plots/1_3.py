@@ -2,6 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.serif": ["Computer Modern Roman"],
+    "axes.labelsize": 20,
+    "xtick.labelsize": 16,
+    "ytick.labelsize": 16,
+    "axes.titlesize": 16
+})
+
+
 def simulate_dimple():
     # --- Parameters ---
     b_radius = 1.2      # Radius of the bubble
