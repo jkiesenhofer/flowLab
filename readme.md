@@ -2,7 +2,7 @@
 
 A multi-language scientific computing project designed to model, simulate, and analyze fluid dynamics, specifically focusing on bubble detection, tracking, particle dynamics, and optical systems. This project integrates physics solvers (C/C++), processing/analysis scripts (Python, MATLAB), a graphical user interface (GUI), and hardware integration (Arduino).
 
-## 🚀 Overview
+## Overview
 
 This repository contains a comprehensive suite of tools to handle fluid simulation workflows:
 * **Simulation Solvers:** Core physics calculations handled via C/C++ (e.g., wave modeling, triangulation, Courant number calculations).
@@ -12,7 +12,7 @@ This repository contains a comprehensive suite of tools to handle fluid simulati
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 Here is an overview of the key files and directories in this repository:
 
@@ -39,7 +39,7 @@ Here is an overview of the key files and directories in this repository:
 
 ---
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
