@@ -1,40 +1,57 @@
-# Chemical Flotation Flow Lab Automation & Analytics
+# Bubble & Particle Fluid Simulation Project
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![OpenCV](https://img.shields.io/badge/OpenCV-4.x-green.svg)](https://opencv.org/)
+A multi-language scientific computing project designed to model, simulate, and analyze fluid dynamics, specifically focusing on bubble detection, tracking, particle dynamics, and optical systems. This project integrates physics solvers (C/C++), processing/analysis scripts (Python, MATLAB), a graphical user interface (GUI), and hardware integration (Arduino).
 
-An open-source suite of Python scripts and tools designed to automate data acquisition, image processing, and hydrodynamic modeling for laboratory-scale chemical flotation columns and cells. 
+## 🚀 Overview
 
-This repository provides general-purpose utilities for researchers and metallurgical engineers to monitor froth kinetics, calculate gas holdup, analyze bubble size distributions (BSD), and interface with lab hardware.
-
----
-
-## Core Features & Scripts
-
-The repository is organized into distinct modules based on experimental workflows:
-
-### 1. Computer Vision & Froth Analytics (`/vision`)
-* `froth_velocity.py`: Utilizes optical flow algorithms (Lucas-Kanade and Farneback) to track froth surface velocity and stability in real-time.
-* `bubble_segmentation.py`: An OpenCV/Water-shed segmentation pipeline to extract bubble size distributions ($BSD$) and Sauter mean diameter ($d_{32}$) from high-speed camera feeds.
-
-### 2. Hydrodynamics & Data Logging (`/hydrodynamics`)
-* `gas_holdup.py`: Calculates gas holdup ($\varepsilon_g$) using differential pressure transmitter data inputs.
-* `flow_controller_interface.py`: Modbus/Serial protocols to dynamically control and log mass flow controllers (MFCs) for superficial gas velocity ($J_g$) adjustments.
-
-### 3. Kinetic Modeling (`/kinetics`)
-* `flotation_kinetics_fitter.py`: Fits experimental recovery data against classic kinetic models (First-order rectangular, Klimpel, Kelsall) using non-linear least squares regression.
+This repository contains a comprehensive suite of tools to handle fluid simulation workflows:
+* **Simulation Solvers:** Core physics calculations handled via C/C++ (e.g., wave modeling, triangulation, Courant number calculations).
+* **Computer Vision & Analysis:** Python and MATLAB scripts dedicated to detecting, tracking, and vector mapping of bubbles.
+* **Hardware Integration:** Arduino code to manage physical particle drop experiments.
+* **User Interface:** A Python-based GUI/App for easy interaction with the data and models.
 
 ---
 
-## Installation
+## 📁 Repository Structure
+
+Here is an overview of the key files and directories in this repository:
+
+| File / Folder | Language / Type | Description |
+| :--- | :--- | :--- |
+| `mesh/` | Directory | Contains mesh generation files for fluid domains. |
+| `plots/` | Directory | Output directory for generated figures and data plots. |
+| `app.py` / `gui` | Python | Main application entry point and Graphical User Interface files. |
+| `bubbleDetection.py` | Python | Computer vision script to isolate bubbles from images/video. |
+| `bubbleIDs.py` | Python | Tracks and assigns unique identifiers to individual bubbles across frames. |
+| `bubbleVectors.py` | Python | Calculates velocity and direction vectors for detected bubbles. |
+| `brightestPoint.py` | Python | Detects laser/light intensity peaks or particle centers. |
+| `courant.py` | Python | Computes the Courant–Friedrichs–Lewy (CFL) condition for simulation stability. |
+| `flowModel.py` | Python | Mathematical modeling of the fluid flow characteristics. |
+| `opticalSystem.py`| Python | Simulates or processes data from the camera/lens setup. |
+| `tpc.py` | Python | Three-Phase Contact line or specialized tracking module. |
+| `bubble.m` | MATLAB | Prototype script for bubble analysis and data visualization. |
+| `wave.cpp` | C++ | Physics solver for wave propagation or free-surface flows. |
+| `triangulation.cpp`| C++ | Spatial discretization or 3D reconstruction geometry logic. |
+| `collision.h` / `hydrophobicity.H` | C++ Headers | Physics parameters for particle collisions and surface tension/wetting properties. |
+| `particleDrop.ino` | Arduino | Firmware for controlling physical particle dropping mechanisms in experiments. |
+| `stokes.html` | HTML | Web-based documentation or visualization for Stokes flow equations. |
+| `makefile` | Build Script | Compilation configuration script for the C/C++ source code. |
+
+---
+
+## 🛠️ Getting Started
 
 ### Prerequisites
-* Python 3.10 or higher
-* C++ Compiler (for certain OpenCV optimization flags, optional)
 
-### Setup
-1. Clone the repository:
+Ensure you have the following installed on your system:
+* **GCC/Clang** (with `make` support for building C++ files)
+* **Python 3.8+**
+* **MATLAB** (Optional, for running `.m` analysis)
+* **Arduino IDE** (Optional, for uploading hardware controls)
+
+### Installation & Setup
+
+1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/yourusername/flowLab.git](https://github.com/yourusername/fowLab.git)
-   cd flowLab
+   git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+   cd your-repo-name
