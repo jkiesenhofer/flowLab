@@ -53,5 +53,5 @@ Ensure you have the following installed on your system:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/flowLab.git](https://github.com/your-username/flowLab.git)
+   git clone [https://github.com/jkiesenhofer/flowLab.git](https://github.com/jkiesenhofer/flowLab.git)
    cd flowLab
