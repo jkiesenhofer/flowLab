@@ -1,176 +1,147 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 # --- Simulation & Physical Parameters ---
-dt = 0.001          # Time step (s)
-t_max = 2.2         # Max simulation time (s)
-time_steps = np.arange(0, t_max, dt)
-N_steps = len(time_steps)
+dt_normal = 0.001    # Physical time step
+t_max = 3.5          # Total simulation timeframe
 
 # Physical Constants
-g = 9.81            # Gravity (m/s^2)
-rho_w = 1000.0      # Density of water (kg/m^3)
-mu_w = 1e-3         # Dynamic viscosity (Pa*s)
-gamma = 0.072       # Surface tension of water (N/m)
-
-# Initial Single Bubble Parameters
-d_b = 1.0e-3        # 1 mm nominal diameter
-r_0 = d_b / 2.0
-bubble_pos = np.array([0.0, 0.0])  
-
-# Hydrophobic Low-Inertia Particle
-r_p = 0.045e-3       
-rho_p = 1150.0      
+rho_w = 1000.0       # Density of water
+r_p = 0.045e-3       # Particle radius
+rho_p = 1150.0       
 m_p = rho_p * (4.0/3.0) * np.pi * (r_p**3)
 
-# Start above and shifted right to hit the upper-right shoulder asymmetrically
+# Bubble Parameters
+d_b = 1.0e-3         
+r_0 = d_b / 2.0      # Characteristic length scale for normalization
+bubble_pos = np.array([0.0, 0.0])  
+
+# Initial Conditions
 particle_pos = np.array([0.22e-3, 1.2e-3])  
 particle_vel = np.array([0.0, -0.12])    
 
-# State Machine Flags
-is_attached = False
-has_split = False
-pinch_depth = 0.0
-split_frame = 0
-contact_time = 0.0
+is_sliding = False
+deformation_amplitude = 0.0
 
-# Unequal Daughter Bubbles (Asymmetric volume split: 70% vs 30%)
-b1_pos, b2_pos = np.zeros(2), np.zeros(2)
-r_daughter_large = r_0 * (0.7)**(1/2) 
-r_daughter_small = r_0 * (0.3)**(1/2) 
+# Define the 4 target snapshot timestamps (seconds)
+target_timesteps = [0.002, 0.005, 0.01, 0.02]
+snapshot_data = {}  # Dictionary to cache position states for plotting
 
-# --- Plot Setup ---
-fig, ax = plt.subplots(figsize=(7, 7), facecolor='#ffffff')
-ax.set_facecolor('#fdfdfd')
-view_size = 1.6e-3  
-ax.set_xlim(-view_size, view_size)
-ax.set_ylim(-view_size, view_size)
-ax.grid(True, color='#e5e5e5', alpha=0.7, linestyle='--')
+# --- Run the Core Simulation Loop to extract states ---
+current_time = 0.0
+step_idx = 0
 
-# Initialize Graphical Objects Handles
-theta = np.linspace(0, 2*np.pi, 250)
-h_bubble_main = ax.fill([], [], color='#e3f2fd', alpha=0.8, edgecolor='#0288d1', linewidth=2.5, zorder=2)[0]
-h_bubble1 = ax.fill([], [], color='#e3f2fd', alpha=0.8, edgecolor='#0288d1', linewidth=2.0, zorder=2, visible=False)[0]
-h_bubble2 = ax.fill([], [], color='#e3f2fd', alpha=0.8, edgecolor='#0288d1', linewidth=2.0, zorder=2, visible=False)[0]
-
-h_particle = ax.scatter([], [], s=55, color='#10b981', edgecolors='#064e3b', zorder=5, label='Hydrophobic Particle')
-h_trajectory, = ax.plot([], [], color='#f59e0b', linestyle='-', linewidth=1.5, alpha=0.6)
-
-ax.tick_params(colors='#333333', labelsize=9)
-ax.set_title("Asymmetric Hydrophobic Dewetting & Off-Center Pinch-Off", color='#111111', fontsize=11, fontweight='bold')
-ax.legend(loc='upper right')
-
+# Track data points for rendering trajectories smoothly
 path_x, path_y = [particle_pos[0]], [particle_pos[1]]
 
-def update(frame):
-    global particle_pos, particle_vel, is_attached, has_split, pinch_depth, b1_pos, b2_pos, split_frame, contact_time
+while current_time <= t_max + dt_normal:
+    dt = dt_normal * 0.25 if current_time < 1.25 else dt_normal
     
-    t = frame * dt
-
-    # --- STAGE 1: ASYMMETRIC APPROACH AND DEWETTING ---
-    if not has_split:
-        dx = particle_pos[0] - bubble_pos[0]
-        dy = particle_pos[1] - bubble_pos[1]
-        dist = np.sqrt(dx**2 + dy**2)
-
-        if not is_attached:
-            if dist > r_0:
-                u_fluid_x = -(-0.12) * (3/2) * (r_0**3) * (dx * dy) / (dist**5)
-                u_fluid_y = (-0.12) * (1 - 0.5 * (r_0/dist)**3 + 1.5 * (r_0**3) * (dy**2) / (dist**5))
-            else:
-                u_fluid_x, u_fluid_y = 0.0, 0.0
-
-            particle_vel[0] = u_fluid_x
-            particle_vel[1] = u_fluid_y
-            particle_pos += particle_vel * dt
-
-            if dist <= (r_0 + r_p):
-                is_attached = True
-                contact_time = t
-        else:
-            t_contact = t - contact_time
-            pinch_depth = min(r_0 * 0.95, r_0 * (t_contact * 3.5))
+    # Save closest state matching target intervals
+    for t_step in target_timesteps:
+        if abs(current_time - t_step) < dt * 0.51:
+            snapshot_data[t_step] = {
+                'pos': particle_pos.copy(),
+                'traj_x': list(path_x),
+                'traj_y': list(path_y),
+                'is_sliding': is_sliding,
+                'deform': deformation_amplitude
+            }
             
-            particle_pos[0] = r_0 * np.cos(np.pi/4) - pinch_depth * 0.6
-            particle_pos[1] = r_0 * np.sin(np.pi/4) - pinch_depth * 0.7
+    # Vector Mathematics 
+    dx = particle_pos[0] - bubble_pos[0]
+    dy = particle_pos[1] - bubble_pos[1]
+    dist = np.sqrt(dx**2 + dy**2)
+    
+    nx, ny = dx / dist, dy / dist
+    tx, ty = -ny, nx  
 
-            if pinch_depth >= r_0 * 0.85:
-                has_split = True
-                split_frame = frame
-                b1_pos = np.array([-r_0 * 0.3,  r_0 * 0.1]) 
-                b2_pos = np.array([ r_0 * 0.8,  r_0 * 0.5]) 
-                h_bubble_main.set_visible(False)
-                h_bubble1.set_visible(True)
-                h_bubble2.set_visible(True)
-
-        path_x.append(particle_pos[0])
-        path_y.append(particle_pos[1])
-
-        xb, yb = [], []
-        for t_val in theta:
-            x_circ = r_0 * np.cos(t_val)
-            y_circ = r_0 * np.sin(t_val)
-            
-            if is_attached:
-                angular_distance = np.abs(t_val - np.pi/4)
-                if angular_distance > np.pi: 
-                    angular_distance = 2*np.pi - angular_distance
-                    
-                if angular_distance < np.pi/3:
-                    weight = np.cos(angular_distance / (np.pi/3) * np.pi / 2.0)
-                    x_circ -= weight * pinch_depth * 0.55
-                    y_circ -= weight * pinch_depth * 0.65
-                
-                if t_val > np.pi and t_val < 1.5*np.pi:
-                    y_circ -= (pinch_depth * 0.2)
-                    
-            xb.append(x_circ)
-            yb.append(y_circ)
-            
-        h_bubble_main.set_xy(np.column_stack((xb, yb)))
-
-    # --- STAGE 2: UNEQUAL DAUGHTER RECOIL ---
+    if dist > (r_0 + r_p):
+        u_fluid_x = -(-0.12) * (3/2) * (r_0**3) * (dx * dy) / (dist**5)
+        u_fluid_y = (-0.12) * (1 - 0.5 * (r_0/dist)**3 + 1.5 * (r_0**3) * (dy**2) / (dist**5))
+        particle_vel[0] = u_fluid_x
+        particle_vel[1] = u_fluid_y
+        deformation_amplitude = max(0.0, deformation_amplitude - 2.0 * dt)
     else:
-        t_post = (frame - split_frame) * dt
-        
-        b1_pos[0] -= 0.12 * np.exp(-10.0 * t_post) * dt + 0.005 * dt 
-        b2_pos[0] += 0.45 * np.exp(-14.0 * t_post) * dt + 0.02 * dt  
-        
-        b1_pos[1] += 0.05 * dt
-        b2_pos[1] += 0.07 * dt 
+        is_sliding = True
+        v_tangential = np.dot(particle_vel, [tx, ty])
+        if abs(v_tangential) < 0.02: 
+            v_tangential = -0.09  
+            
+        particle_pos[0] = (r_0 + r_p) * nx
+        particle_pos[1] = (r_0 + r_p) * ny
+        particle_vel[0] = v_tangential * tx
+        particle_vel[1] = v_tangential * ty
+        deformation_amplitude = min(r_0 * 0.12, deformation_amplitude + 0.4 * dt)
 
-        particle_pos[0] = b2_pos[0] - r_daughter_small * 0.5
-        particle_pos[1] = b2_pos[1] + r_daughter_small * 0.5
-        path_x.append(particle_pos[0])
-        path_y.append(particle_pos[1])
+    particle_pos += particle_vel * dt
+    path_x.append(particle_pos[0])
+    path_y.append(particle_pos[1])
+    current_time += dt
 
-        E1 = max(0.75, 1.0 - 0.25 * np.exp(-7.0 * t_post))
-        E2 = max(0.50, 1.0 - 0.50 * np.exp(-12.0 * t_post)) 
-        
-        xb1 = b1_pos[0] + (r_daughter_large / np.sqrt(E1)) * np.cos(theta)
-        yb1 = b1_pos[1] + (r_daughter_large * np.sqrt(E1)) * np.sin(theta)
-        h_bubble1.set_xy(np.column_stack((xb1, yb1)))
-        
-        xb2 = b2_pos[0] + (r_daughter_small / np.sqrt(E2)) * np.cos(theta)
-        yb2 = b2_pos[1] + (r_daughter_small * np.sqrt(E2)) * np.sin(theta)
-        h_bubble2.set_xy(np.column_stack((xb2, yb2)))
-        
-    h_particle.set_offsets([particle_pos[0], particle_pos[1]])
-    h_trajectory.set_data(path_x, path_y)
+# --- Plot Setup (4 Subplots Side-by-Side) ---
+fig, axes = plt.subplots(1, 4, figsize=(16, 5), sharey=True, facecolor='#ffffff')
+view_size_meters = 1.5e-3  
+view_size_dimensionless = view_size_meters / r_0  # Normalized view limits
+
+theta = np.linspace(0, 2*np.pi, 250)
+
+for idx, (ax, t_val) in enumerate(zip(axes, target_timesteps)):
+    ax.set_facecolor('#fdfdfd')
+    ax.set_xlim(-view_size_dimensionless, view_size_dimensionless)
+    ax.set_ylim(-view_size_dimensionless, view_size_dimensionless)
+    ax.set_aspect('equal')
+    ax.grid(True, color='#e5e5e5', alpha=0.5, linestyle='--')
     
-    return h_bubble_main, h_bubble1, h_bubble2, h_particle, h_trajectory
+    # Set dimensionless axis labels
+    ax.set_xlabel(r'$x / r_0$', fontsize=10, color='#333333')
+    if idx == 0:
+        ax.set_ylabel(r'$y / r_0$', fontsize=10, color='#333333')
+    
+    # Extract historical states from run loop dictionary
+    state = snapshot_data[t_val]
+    p_pos = state['pos']
+    d_amp = state['deform']
+    
+    # Scale variables to be dimensionless
+    p_pos_dimless = p_pos / r_0
+    traj_x_dimless = np.array(state['traj_x']) / r_0
+    traj_y_dimless = np.array(state['traj_y']) / r_0
+    d_amp_dimless = d_amp / r_0
+    r_0_dimless = 1.0  # Normalized bubble radius is always 1
+    
+    # Regenerate mesh profile using dimensionless variables
+    xb, yb = [], []
+    nx_s, ny_s = p_pos[0] / np.linalg.norm(p_pos), p_pos[1] / np.linalg.norm(p_pos)
+    p_angle = np.arctan2(ny_s, nx_s)
+    if p_angle < 0: p_angle += 2 * np.pi
 
-# --- Animation Generation Framework ---
-anim = animation.FuncAnimation(fig, update, frames=N_steps, interval=12, blit=False, repeat=False)
+    for angle in theta:
+        x_c = r_0_dimless * np.cos(angle)
+        y_c = r_0_dimless * np.sin(angle)
+        if state['is_sliding'] and d_amp > 0:
+            ang_dist = np.abs(angle - p_angle)
+            if ang_dist > np.pi: ang_dist = 2 * np.pi - ang_dist
+            if ang_dist < np.pi/4:
+                w = np.cos(ang_dist / (np.pi/4) * np.pi / 2.0)**2
+                x_c -= w * d_amp_dimless * np.cos(p_angle)
+                y_c -= w * d_amp_dimless * np.sin(p_angle)
+        xb.append(x_c)
+        yb.append(y_c)
+        
+    # Render spatial objects in dimensionless space
+    ax.fill(xb, yb, color='#e3f2fd', alpha=0.8, edgecolor='#0288d1', linewidth=2, zorder=2)
+    ax.plot(traj_x_dimless, traj_y_dimless, color='#f59e0b', linestyle='-', linewidth=1.5, alpha=0.7, zorder=3)
+    ax.scatter(p_pos_dimless[0], p_pos_dimless[1], s=70, color='#38bdf8', edgecolors='#0369a1', linewidth=1.5, zorder=4)
+    
+    # Subplot titles
+    ax.set_title(f"T = {t_val:.3f}s", fontsize=12, fontweight='bold', pad=12, color='#111111')
+    
+    # Adjust border parameters
+    for spine in ax.spines.values():
+        spine.set_edgecolor('#cccccc')
+        spine.set_linewidth(1.2)
+    ax.tick_params(colors='#777777', labelsize=8)
 
-# =====================================================================
-# SAVING PIPELINE CODE: Compiling into an MP4 file
-# =====================================================================
-print("Compiling and saving the video file... Please wait.")
-# Use FFMpegWriter with matching capital letters
-writer = animation.FFMpegWriter(fps=60, metadata=dict(artist='Me'), bitrate=2000)
-anim.save("asymmetric_bubble_split.mp4", writer=writer)
-print("Saved successfully as 'asymmetric_bubble_split.mp4'!")
-
+plt.tight_layout()
 plt.show()
