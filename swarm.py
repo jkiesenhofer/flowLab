@@ -100,7 +100,7 @@ ax.set_ylim([-6.0, 6.0])
 ax.set_zlim([-15, 15])
 ax.set_xlabel('X (mm)')
 ax.set_ylabel('Y (mm)')
-ax.set_zlabel('Z (mm / Rise Height)')
+ax.set_zlabel('Z (Rise Height in mm)')
 #ax.set_title('Turbulent Multi-Phase Flotation Column (Vectorized Swarm)')
 ax.legend(handles=legend_elements, loc='upper left')  # Overriding legend with our explicit elements
 ax.grid(True, linestyle=':', alpha=0.5)
