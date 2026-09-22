@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DB_FILE="flotation_simulation.db"
-URL="http://jkiesenhofer.bplaced.net/db/flotation_simulation.db"
+DB_FILE="experimentalBubbles.db"
+URL="http://jkiesenhofer.bplaced.net/db/experimentalBubbles.db"
 
 # 1. Download the database file if it isn't already local
 if [ ! -f "$DB_FILE" ]; then
@@ -22,12 +22,9 @@ sqlite3 "$DB_FILE" <<EOF
 .mode column
 .headers on
 
--- Show all tables in the database
-.tables
-
--- View the schema of the simulation_data table
-.schema simulation_data
+-- View the schema of the bubble_tracking table
+.schema bubble_tracking
 
 -- Show a preview of the dataset (limited to avoid terminal flooding)
-SELECT * FROM simulation_data LIMIT 2000;
+SELECT * FROM bubble_tracking LIMIT 2000;
 EOF
