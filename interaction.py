@@ -2,7 +2,7 @@ import sqlite3
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 1. Execute SQL Query via SQLite for Fluid Mesh + Particle Trajectory Dynamics
+# 1. Execute SQL Query with strict polar interface constraint during contact
 sql_query = """
 WITH RECURSIVE
   -- Grid steps: x in [-3.0, 3.0] with 25 points
@@ -19,9 +19,8 @@ WITH RECURSIVE
     SELECT iy + 1, ROUND(-4.0 + (iy + 1) * (7.0 / 28.0), 4)
     FROM y_steps WHERE iy < 28
   ),
-  -- Flow Parameters: U_rise = 1.0, R = 1.0 (ellipsoidal b=0.85)
   params AS (
-    SELECT 1.0 AS U_rise, 1.0 AS R
+    SELECT 1.0 AS U_rise, 1.0 AS Rx, 0.85 AS Ry
   ),
   buoyant_calc AS (
     SELECT 
@@ -29,8 +28,9 @@ WITH RECURSIVE
       x.x,
       y.y,
       p.U_rise,
-      p.R,
-      ROUND(SQRT(x.x * x.x + (y.y / 0.85) * (y.y / 0.85)), 4) AS r_eff,
+      p.Rx,
+      p.Ry,
+      ROUND(SQRT((x.x/p.Rx)*(x.x/p.Rx) + (y.y/p.Ry)*(y.y/p.Ry)), 4) AS r_eff,
       ROUND(SQRT(x.x * x.x + y.y * y.y), 4) AS r
     FROM x_steps x
     CROSS JOIN y_steps y
@@ -38,76 +38,81 @@ WITH RECURSIVE
   ),
   buoyant_velocities AS (
     SELECT 
-      cell_id,
-      x,
-      y,
-      r_eff,
-      r,
+      cell_id, x, y, r_eff, r,
       CASE 
-        WHEN r_eff <= R THEN 0.0
-        WHEN y < -R THEN -0.8 * U_rise * (x / (R + ABS(y))) * EXP(-(x * x + (y + 1.5) * (y + 1.5)))
-        ELSE -U_rise * (1.5 * (R * R) / (r * r)) * (x * y / (r * r))
+        WHEN r_eff <= 1.0 THEN 0.0
+        WHEN y < -Ry THEN -0.8 * U_rise * (x / (Rx + ABS(y))) * EXP(-(x * x + (y + 1.5) * (y + 1.5)))
+        ELSE -U_rise * (1.5 * (Rx * Rx) / (r * r)) * (x * y / (r * r))
       END AS u_raw,
       CASE 
-        WHEN r_eff <= R THEN 0.0
-        WHEN y < -R THEN -U_rise + 0.6 * U_rise * EXP(-(x * x) / (0.8 * R)) * EXP(0.4 * y)
-        ELSE -U_rise * (1.0 - 0.5 * (R / r) + 1.5 * (R * R * y * y) / (r * r * r * r))
+        WHEN r_eff <= 1.0 THEN 0.0
+        WHEN y < -Ry THEN -U_rise + 0.6 * U_rise * EXP(-(x * x) / (0.8 * Rx)) * EXP(0.4 * y)
+        ELSE -U_rise * (1.0 - 0.5 * (Rx / r) + 1.5 * (Rx * Rx * y * y) / (r * r * r * r))
       END AS v_raw
     FROM buoyant_calc
   ),
-  -- Particle Trajectory Simulation via Recursive CTE (Approaching from y = 2.5)
+  -- Trajectory Simulation: Exact interface sliding along r_eff = 1.0
   particle_sim AS (
-    -- Initial State: t=0, particle at x_p = 0.35, y_p = 2.5
+    -- Start: Approaching from top-right
     SELECT 
       0 AS step,
-      0.0 AS t,
       0.35 AS xp,
       2.5 AS yp,
       0.0 AS up,
       -0.8 AS vp,
+      ATAN2(2.5/0.85, 0.35) AS theta, -- Polar angle
       'APPROACHING' AS state
     UNION ALL
     SELECT 
       step + 1,
-      ROUND((step + 1) * 0.05, 3) AS t,
-      -- Position update
+      -- Position Update
       ROUND(
         CASE 
-          -- Contact phase: Sliding around bubble interface (R_eff ~ 1.05)
-          WHEN SQRT(xp*xp + (yp/0.85)*(yp/0.85)) <= 1.05 THEN
-            1.05 * COS(ATAN2(yp/0.85, xp))
-          ELSE xp + up * 0.05 
+          -- ON INTERFACE: Constrain x, y strictly to bubble boundary (r_eff = 1.0)
+          WHEN state = 'SLIDING' OR (SQRT((xp)*(xp) + (yp/0.85)*(yp/0.85)) <= 1.02 AND theta >= -1.57) THEN
+            1.0 * COS(theta - 0.06)
+          WHEN state = 'DETACHED' THEN xp + up * 0.05
+          ELSE xp + up * 0.05
         END, 4
       ) AS xp,
       ROUND(
         CASE 
-          WHEN SQRT(xp*xp + (yp/0.85)*(yp/0.85)) <= 1.05 THEN
-            1.05 * 0.85 * SIN(ATAN2(yp/0.85, xp))
-          ELSE yp + vp * 0.05 
+          -- ON INTERFACE: Constrain y strictly to 0.85 * sin(theta)
+          WHEN state = 'SLIDING' OR (SQRT((xp)*(xp) + (yp/0.85)*(yp/0.85)) <= 1.02 AND theta >= -1.57) THEN
+            0.85 * SIN(theta - 0.06)
+          WHEN state = 'DETACHED' THEN yp + vp * 0.05
+          ELSE yp + vp * 0.05
         END, 4
       ) AS yp,
-      -- Velocity update (Stokes drag driving towards fluid velocity + sliding force)
+      -- Velocity Update
       ROUND(
         CASE 
-          WHEN SQRT(xp*xp + (yp/0.85)*(yp/0.85)) <= 1.05 THEN 0.6 * (xp / SQRT(xp*xp + yp*yp))
+          WHEN state = 'SLIDING' OR (SQRT((xp)*(xp) + (yp/0.85)*(yp/0.85)) <= 1.02 AND theta >= -1.57) THEN
+            -1.0 * SIN(theta) -- Tangential vector u_theta
           ELSE up + 4.0 * ((-1.0 * (1.5 / (xp*xp + yp*yp)) * (xp * yp / (xp*xp + yp*yp))) - up) * 0.05
         END, 4
       ) AS up,
       ROUND(
         CASE 
-          WHEN SQRT(xp*xp + (yp/0.85)*(yp/0.85)) <= 1.05 THEN -0.8 * ABS(yp / SQRT(xp*xp + yp*yp))
+          WHEN state = 'SLIDING' OR (SQRT((xp)*(xp) + (yp/0.85)*(yp/0.85)) <= 1.02 AND theta >= -1.57) THEN
+            0.85 * COS(theta) -- Tangential vector v_theta
           ELSE vp + 4.0 * ((-1.0 * (1.0 - 0.5 / SQRT(xp*xp + yp*yp))) - vp) * 0.05 - 0.2 * 0.05
         END, 4
       ) AS vp,
+      -- Polar angle evolution along interface
       CASE 
-        WHEN SQRT(xp*xp + (yp/0.85)*(yp/0.85)) <= 1.06 AND yp > -0.2 THEN 'SURFACE CONTACT / SLIDING'
-        WHEN yp <= -0.2 THEN 'DETACHED IN WAKE'
+        WHEN state = 'SLIDING' OR (SQRT((xp)*(xp) + (yp/0.85)*(yp/0.85)) <= 1.02 AND theta >= -1.57) THEN theta - 0.06
+        ELSE theta
+      END AS theta,
+      -- State Transition
+      CASE 
+        WHEN theta <= -1.50 THEN 'DETACHED'
+        WHEN SQRT((xp)*(xp) + (yp/0.85)*(yp/0.85)) <= 1.02 OR state = 'SLIDING' THEN 'SLIDING'
         ELSE 'APPROACHING'
       END AS state
     FROM particle_sim
-    WHERE step < 70 AND yp > -3.5
+    WHERE step < 75 AND yp > -3.5
   )
--- Return fluid grid rows along with particle positions
 SELECT 
   bv.cell_id, bv.x, bv.y,
   CASE WHEN bv.r_eff <= 1.0 THEN 0.0 ELSE ROUND(bv.u_raw, 4) END AS u,
@@ -125,7 +130,7 @@ cursor.execute(sql_query)
 rows = cursor.fetchall()
 conn.close()
 
-# 2. Extract Fluid Field and Particle Trajectory
+# 2. Extract Data
 x_vals = sorted(list(set(row[1] for row in rows)))
 y_vals = sorted(list(set(row[2] for row in rows)))
 
@@ -143,51 +148,48 @@ for row in rows:
     U[iy, ix] = u
     V[iy, ix] = v
     if xp is not None:
-        particle_traj.append((xp, yp, up, vp, state))
+        particle_traj.append((xp, yp, state))
 
 px = [pt[0] for pt in particle_traj]
 py = [pt[1] for pt in particle_traj]
 
-# Mask interior of bubble
+# Mask bubble interior
 R_mesh = np.sqrt(X**2 + (Y / 0.85)**2)
 U_masked = np.ma.masked_where(R_mesh <= 1.0, U)
 V_masked = np.ma.masked_where(R_mesh <= 1.0, V)
 Speed = np.sqrt(U_masked**2 + V_masked**2)
 
-# 3. Plot Fluid Field + Particle Contact Trajectory
+# 3. Plot Vector Field & Interface Sliding Path
 fig, ax = plt.subplots(figsize=(8, 9))
 
-# Background fluid speed heatmap
+# Speed Heatmap
 c = ax.pcolormesh(X, Y, Speed, cmap='viridis', shading='auto', alpha=0.75)
 fig.colorbar(c, ax=ax, label='Liquid Speed $\\sqrt{u^2 + v^2}$')
 
-# Streamlines of fluid
+# Streamlines
 ax.streamplot(x_vals, y_vals, U_masked, V_masked, color='white', density=1.1, linewidth=0.8)
 
-# Bubble boundary
-theta = np.linspace(0, 2 * np.pi, 200)
-bx = 1.0 * np.cos(theta)
-by = 0.85 * np.sin(theta)
-ax.fill(bx, by, color='#e0f7fa', ec='#00838f', lw=2.5, zorder=5, label='Buoyant Bubble ($R=1$)')
+# Draw Bubble Boundary Curve (Interface)
+theta_arr = np.linspace(0, 2 * np.pi, 300)
+bx = 1.0 * np.cos(theta_arr)
+by = 0.85 * np.sin(theta_arr)
+ax.plot(bx, by, color='#00838f', lw=3, zorder=5, label='Bubble-Water Interface ($r_{eff}=1.0$)')
+ax.fill(bx, by, color='#e0f7fa', alpha=0.8, zorder=4)
 
-# Plot Particle Trajectory
-ax.plot(px, py, color='red', linestyle='--', linewidth=2.5, zorder=8, label='Particle Trajectory')
+# Plot Particle Trajectory directly along interface
+ax.plot(px, py, color='red', linestyle='-', linewidth=3, zorder=8, label='Particle Path (Interface Sliding)')
 
-# Draw particle at key positions (Approach, Contact, Detachment)
-ax.scatter([px[0]], [py[0]], color='yellow', edgecolors='black', s=120, zorder=10, label='Particle Start')
-ax.scatter([px[18]], [py[18]], color='orange', edgecolors='black', s=130, zorder=10, label='First Contact Point')
-ax.scatter([px[-1]], [py[-1]], color='magenta', edgecolors='black', s=120, zorder=10, label='Detached in Wake')
+# Key Points
+ax.scatter([px[0]], [py[0]], color='yellow', edgecolors='black', s=110, zorder=10, label='Particle Approach')
+ax.scatter([px[18]], [py[18]], color='orange', edgecolors='black', s=120, zorder=10, label='Interface Contact Point')
+ax.scatter([px[-1]], [py[-1]], color='magenta', edgecolors='black', s=110, zorder=10, label='Detachment into Wake')
 
-# Trajectory Annotation Arrows
-ax.annotate('1. Approaching', xy=(px[5], py[5]), xytext=(px[5]+0.6, py[5]+0.3),
-            arrowprops=dict(arrowstyle="->", color='red', lw=1.5), fontsize=10, fontweight='bold', color='darkred')
-ax.annotate('2. Contact & Sliding', xy=(px[20], py[20]), xytext=(px[20]+0.8, py[20]),
-            arrowprops=dict(arrowstyle="->", color='orange', lw=1.5), fontsize=10, fontweight='bold', color='darkorange')
-ax.annotate('3. Wake Detachment', xy=(px[-10], py[-10]), xytext=(px[-10]+0.6, py[-10]-0.3),
-            arrowprops=dict(arrowstyle="->", color='magenta', lw=1.5), fontsize=10, fontweight='bold', color='purple')
+# Annotations
+ax.annotate('Strict Sliding along Interface', xy=(px[28], py[28]), xytext=(px[28]+0.6, py[28]+0.2),
+            arrowprops=dict(arrowstyle="->", color='red', lw=2), fontsize=10, fontweight='bold', color='darkred')
 
 # Formatting
-ax.set_title('Approaching Particle Hydrodynamics & Surface Contact with Rising Bubble', fontsize=11)
+ax.set_title('Particle Hydrodynamics: Sliding Along Bubble-Water Interface', fontsize=11)
 ax.set_xlabel('Horizontal Position $x$')
 ax.set_ylabel('Vertical Position $y$')
 ax.set_xlim(-3.0, 3.0)
