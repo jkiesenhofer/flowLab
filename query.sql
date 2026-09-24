@@ -1,7 +1,15 @@
-SELECT *
-FROM (
-    SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS row_num
-    FROM simulation_data
-) AS subquery
-WHERE row_num BETWEEN 7 AND 11;
+WITH random_select AS (
+    SELECT 
+        CAST(ABS(RANDOM()) % 100 + 1 AS INTEGER) AS cell_id
+)
+SELECT 
+    cell_id, 
+    'Original Value' AS description
+FROM random_select
 
+UNION ALL
+
+SELECT 
+    cell_id * cell_id AS cell_id, 
+    'Squared Value' AS description
+FROM random_select;
