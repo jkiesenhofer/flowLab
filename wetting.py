@@ -19,11 +19,11 @@ sigma = 4.0                # Surface tension coefficient
 rho_l, rho_g = 1.0, 0.1    # Liquid and gas densities
 mu_l, mu_g = 0.5, 0.05     # Liquid and gas dynamic viscosities
 
-theta_eq_deg = 135.0       # Contact angle of liquid phase at particle surface
+theta_eq_deg = 165.0       # Contact angle of liquid phase at particle surface
 theta_eq = np.radians(theta_eq_deg)
 
 # Particle Properties (0.8 mm diameter -> r_p = 0.4 mm -> 5.0 grid units)
-r_p = 5.0                  
+r_p = 2.0                  
 
 # Bubble Geometry (2.0 mm diameter -> radius = 1.0 mm -> 12.5 grid units)
 radius = 12.5              
@@ -36,11 +36,11 @@ particle_x = center_x + radius * np.cos(offset_angle)
 particle_y = center_y + radius * np.sin(offset_angle)
 
 # Forces & Kinematics parameters
-g = 20.0                   # Gravitational acceleration
+g = -20.0                   # Gravitational acceleration
 f_cap_coeff = 2.5          # Capillary force coupling strength
 v_p_y = 0.0                # Initial vertical velocity
 v_p_x = 0.0                # Initial horizontal velocity
-particle_mass = 15.0       # Effective particle mass
+particle_mass = -0.1       # Effective particle mass
 
 x = np.arange(Nx) * dx
 y = np.arange(Ny) * dy
