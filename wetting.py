@@ -40,7 +40,7 @@ g = -20.0                   # Gravitational acceleration
 f_cap_coeff = 2.5          # Capillary force coupling strength
 v_p_y = 0.0                # Initial vertical velocity
 v_p_x = 0.0                # Initial horizontal velocity
-particle_mass = -0.1       # Effective particle mass
+particle_mass = 1       # Effective particle mass
 
 x = np.arange(Nx) * dx
 y = np.arange(Ny) * dy
