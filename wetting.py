@@ -36,7 +36,7 @@ particle_x = center_x + radius * np.cos(offset_angle)
 particle_y = center_y + radius * np.sin(offset_angle)
 
 # Forces & Kinematics parameters
-g = -20.0                   # Gravitational acceleration
+g = -10.0                   # Gravitational acceleration
 f_cap_coeff = 2.5          # Capillary force coupling strength
 v_p_y = 0.0                # Initial vertical velocity
 v_p_x = 0.0                # Initial horizontal velocity
